@@ -1,20 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-export const OddsButton = ({ odds, isPositive }) => {
+// OddsButton Component
+export const OddsButton = ({ odds, isPositive, onOddsButtonClick }) => {
+  const [isSelected, setIsSelected] = useState(false);
+
+  const handlePress = () => {
+    setIsSelected((prevSelected) => !prevSelected);
+    if (onOddsButtonClick) {
+      onOddsButtonClick();
+    }
+  };
+
   return (
-    <TouchableOpacity style={[styles.oddsButton, isPositive ? styles.positiveOdds : styles.negativeOdds]}>
+    <TouchableOpacity 
+      style={[
+        styles.oddsButton, 
+        isPositive ? styles.positiveOdds : styles.negativeOdds, 
+        isSelected ? styles.selected : styles.unselected
+      ]}
+      onPress={handlePress}
+    >
       <Text style={styles.oddsText}>{odds}</Text>
     </TouchableOpacity>
   );
-}
+};
 
+// PrimaryButton Component
 export const PrimaryButton = ({ title, onPress }) => (
   <TouchableOpacity style={styles.primaryButton} onPress={onPress}>
     <Text style={styles.primaryButtonText}>{title}</Text>
   </TouchableOpacity>
 );
 
+// SecondaryButton Component
 export const SecondaryButton = ({ title, onPress }) => (
   <TouchableOpacity style={styles.secondaryButton} onPress={onPress}>
     <Text style={styles.secondaryButtonText}>{title}</Text>
@@ -28,15 +47,24 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
   },
   positiveOdds: {
-    backgroundColor: '#2a2a3e',
+    borderColor: '#fff',
   },
   negativeOdds: {
-    backgroundColor: '#3a2a2e',
+    borderColor: '#000fff000',
+  },
+  selected: {
+    backgroundColor: '#4a90e2',
+    borderColor: '#4a90e2',
+  },
+  unselected: {
+    backgroundColor: 'transparent',
+    borderColor: '#fff',
   },
   oddsText: {
-    color: '#ffd700',
+    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -70,5 +98,5 @@ const styles = StyleSheet.create({
   },
 });
 
+// Export components
 export default { OddsButton, PrimaryButton, SecondaryButton };
-

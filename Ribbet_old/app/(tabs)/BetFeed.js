@@ -1,19 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, SafeAreaView, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import { FlatList, StyleSheet, SafeAreaView, Text, View, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import ScrollCard from '../../components/ScrollCard';
+import ActiveBetCard from '../../components/ActiveBetCard'; // New component
 import { useUserData } from '../../utils/UserDataContext';
+import { FloatingActionButton } from '../../components/FloatingActionButton';
 
 const BetFeed = () => {
   const { userData } = useUserData();
   const [betCards, setBetCards] = useState([]);
   const [friendGroups, setFriendGroups] = useState(['All']);
   const [selectedGroup, setSelectedGroup] = useState('All');
+  const [selectedBet, setSelectedBet] = useState(null);
+  const [selectedOdds, setSelectedOdds] = useState(null);
+  const [activeBets, setActiveBets] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isPicksModalVisible, setIsPicksModalVisible] = useState(false);
 
   useEffect(() => {
     console.log('userData:', userData);
     if (userData && userData.bets && Array.isArray(userData.bets)) {
       const transformedBets = userData.bets.map(bet => ({
         id: bet.id || Math.random().toString(),
+       // title: bet.title || 'Untitled Bet',  // Example property for bet title
         creator: bet.creator?.displayName || 'Unknown Creator',
         subject: bet.subject?.displayName || 'Unknown Subject',
         oddsPos: Number(bet.oddsPos) || 0,
@@ -38,16 +46,38 @@ const BetFeed = () => {
     ? betCards
     : betCards.filter(bet => bet.group === selectedGroup);
 
-  // const GroupButton = ({ group }) => (
-  //   <TouchableOpacity
-  //     style={[styles.groupButton, selectedGroup === group && styles.selectedGroupButton]}
-  //     onPress={() => setSelectedGroup(group)}
-  //   >
-  //     <Text style={[styles.groupButtonText, selectedGroup === group && styles.selectedGroupButtonText]}>
-  //       {group}
-  //     </Text>
-  //   </TouchableOpacity>
-  // );
+  const handleOddsButtonClick = (bet, odds) => {
+    setSelectedBet(bet);
+    setSelectedOdds(odds);
+  };
+
+  const handleFloatingActionClick = () => {
+    setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const confirmBet = () => {
+    if (selectedBet) {
+      // Add the bet to activeBets list with selected odds
+      setActiveBets([...activeBets, { ...selectedBet, selectedOdds }]);
+      // Clear selected bet after confirming
+      setSelectedBet(null);
+      setSelectedOdds(null);
+      closeModal();
+    }
+  };
+
+  const openPicksModal = () => {
+    setIsPicksModalVisible(true);
+  };
+
+  const closePicksModal = () => {
+    setIsPicksModalVisible(false);
+  };
+
   const GroupButton = ({ group }) => (
     <TouchableOpacity
       style={[styles.groupButton, selectedGroup === group && styles.selectedGroupButton]}
@@ -59,14 +89,14 @@ const BetFeed = () => {
     </TouchableOpacity>
   );
 
-  console.log('Rendered Friend Groups:', friendGroups);
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.picksContainer}>
-          <Text style={styles.picksNumber}>{userData?.profile?.selectionArray?.length || 0}</Text>
-          <Text style={styles.picksLabel}>My Picks</Text>
+          <TouchableOpacity onPress={openPicksModal}>
+            <Text style={styles.picksNumber}>{activeBets.length}</Text>
+            <Text style={styles.picksLabel}>My Picks</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.coinsContainer}>
           <Text style={styles.coinsAmount}>{userData?.profile?.coinBalance || 0}</Text>
@@ -86,11 +116,41 @@ const BetFeed = () => {
       </View>
       <FlatList
         data={filteredBets}
-        renderItem={({ item }) => <ScrollCard {...item} />}
+        renderItem={({ item }) => (
+          <View style={styles.cardContainer}>
+            <ScrollCard {...item} onOddsButtonClick={(odds) => handleOddsButtonClick(item, odds)} />
+          </View>
+        )}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.feedList}
         ListEmptyComponent={<Text style={styles.loadingText}>No bets available for this group</Text>}
       />
+      {selectedBet && (
+        <FloatingActionButton onPress={handleFloatingActionClick} />
+      )}
+      <Modal visible={isModalVisible} transparent={true} animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>Confirm your bet on whether {selectedBet?.description}</Text>
+            <TouchableOpacity style={styles.modalButton} onPress={confirmBet}>
+              <Text style={styles.modalButtonText}>Confirm</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      <Modal visible={isPicksModalVisible} transparent={true} animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>My Picks</Text>
+            {activeBets.map(bet => (
+              <ActiveBetCard key={bet.id} description={bet.description} selectedOdds={bet.selectedOdds} />
+            ))}
+            <TouchableOpacity style={styles.modalButton} onPress={closePicksModal}>
+              <Text style={styles.modalButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -98,7 +158,7 @@ const BetFeed = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1E1E2E',
+    backgroundColor: '#A5C7D7',
   },
   header: {
     flexDirection: 'row',
@@ -106,13 +166,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#2A2A3A',
+    backgroundColor: '#A5C7D7',
   },
   picksContainer: {
     alignItems: 'center',
   },
   picksNumber: {
-    color: '#FFD700',
+    color: '#fff',
     fontSize: 24,
     fontWeight: 'bold',
   },
@@ -124,7 +184,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   coinsAmount: {
-    color: '#FFD700',
+    color: '#fff',
     fontSize: 24,
     fontWeight: 'bold',
   },
@@ -133,10 +193,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   groupBarContainer: {
-    backgroundColor: '#2A2A3A',
+    backgroundColor: '#A5C7D7',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#3A3A4A',
+    borderBottomColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#fff',
   },
   groupBar: {
     flexDirection: 'row',
@@ -148,7 +210,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     marginHorizontal: 4,
     borderRadius: 16,
-    backgroundColor: '#3A3A4A',
+    backgroundColor: '#A5E490',
   },
   selectedGroupButton: {
     backgroundColor: '#4A90E2',
@@ -164,12 +226,41 @@ const styles = StyleSheet.create({
   feedList: {
     paddingHorizontal: 10,
     paddingVertical: 20,
+    alignItems: 'center', // Align children (cards) in the center horizontally
+  },
+  cardContainer: {
+    width: '90%', // This line makes the item (card container) take 90% of the width
+    marginBottom: 10, // Adjust vertical spacing as needed
   },
   loadingText: {
     color: '#FFFFFF',
     fontSize: 18,
     textAlign: 'center',
     marginTop: 20,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 15,
+  },
+  modalButton: {
+    backgroundColor: '#4a90e2',
+    padding: 10,
+    borderRadius: 5,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontSize: 16,
   },
 });
 

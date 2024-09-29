@@ -11,7 +11,7 @@ const formatOdds = (odds) => {
   }
 };
 
-const ScrollCard = ({ creator, subject, oddsPos, oddsNeg, description, endDate, group }) => {
+const ScrollCard = ({ creator, subject, oddsPos, oddsNeg, description, endDate, group, onOddsButtonClick }) => {
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -26,8 +26,8 @@ const ScrollCard = ({ creator, subject, oddsPos, oddsNeg, description, endDate, 
       </View>
       <Text style={styles.description}>{description}</Text>
       <View style={styles.oddsContainer}>
-        <OddsButton odds={formatOdds(oddsPos)} isPositive={oddsPos >= 0} />
-        <OddsButton odds={formatOdds(oddsNeg)} isPositive={oddsNeg >= 0} />
+        <OddsButton odds={formatOdds(oddsPos)} isPositive={oddsPos >= 0} onOddsButtonClick={() => onOddsButtonClick(oddsPos)} />
+        <OddsButton odds={formatOdds(oddsNeg)} isPositive={oddsNeg >= 0} onOddsButtonClick={() => onOddsButtonClick(oddsNeg)} />
       </View>
       <View style={styles.footer}>
         <Text style={styles.endDate}>{new Date(endDate).toLocaleDateString()}</Text>
@@ -39,11 +39,12 @@ const ScrollCard = ({ creator, subject, oddsPos, oddsNeg, description, endDate, 
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#A5E490',
     borderRadius: 10,
     padding: 15,
     marginVertical: 10,
     width: Dimensions.get('window').width * 0.9,
+    
   },
   header: {
     flexDirection: 'row',
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    color: '#8888aa',
+    color: '#fff',
     fontSize: 10,
     marginBottom: 2,
   },
@@ -89,5 +90,3 @@ const styles = StyleSheet.create({
 });
 
 export default ScrollCard;
-
-

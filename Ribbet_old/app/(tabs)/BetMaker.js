@@ -4,7 +4,6 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { Button, ButtonGroup } from 'react-native-elements';
 import Slider from '@react-native-community/slider';
 
-
 export default function BetMaker() {
  const [selectedIndex, setSelectedIndex] = useState(0);
  const [group, setGroup] = useState('');
@@ -13,16 +12,13 @@ export default function BetMaker() {
  const [betLine, setBetLine] = useState(-100); // Initialize with smallest allowable value
  const [expectedNumber, setExpectedNumber] = useState('');
 
-
  const buttons = ['Yes/No', 'Over/Under'];
-
 
  const groupData = [
    { label: 'Group 1', value: 'group1' },
    { label: 'Group 2', value: 'group2' },
    { label: 'Group 3', value: 'group3' },
  ];
-
 
  const personData = [
    { label: 'No Person Selected', value: '' },
@@ -31,9 +27,7 @@ export default function BetMaker() {
    { label: 'Person 3', value: 'person3' },
  ];
 
-
  const formatBetLine = (value) => (value > 0 ? `+${value}` : `${value}`);
-
 
  const handleConfirm = () => {
    console.log('Bet Confirmed:', {
@@ -46,7 +40,6 @@ export default function BetMaker() {
    // You can add any other logic you need to handle the confirmation here.
  };
 
-
  const handleSliderChange = (value) => {
    const invertedValue = -value; // Reverse the polarity
    if (invertedValue > -100 && invertedValue < 100) {
@@ -57,35 +50,29 @@ export default function BetMaker() {
    }
  };
 
-
  const isConfirmDisabled = !group || !betTitle || (selectedIndex === 0 && !betLine) || (selectedIndex === 1 && !expectedNumber);
-
 
  return (
    <View style={styles.container}>
-     <Text>Bet Maker Screen</Text>
-
-
      <ButtonGroup
        onPress={(value) => setSelectedIndex(value)}
        selectedIndex={selectedIndex}
        buttons={buttons}
        containerStyle={styles.buttonGroup}
+       selectedButtonStyle={styles.selectedButton} // Apply custom selected button style
      />
 
-
-     <Text>Bet Title:</Text>
      <TextInput
        style={styles.textInput}
-       placeholder="Enter Bet Title"
+       placeholder="Enter the Bet Title"
+       placeholderTextColor="rgba(255, 255, 255, 0.6)" // Placeholder text color
        value={betTitle}
        onChangeText={setBetTitle}
      />
 
-
      <View style={styles.dropdownsContainer}>
        <View style={styles.dropdownWrapper}>
-         <Text>Group:</Text>
+         <Text style={styles.labelText}>Group:</Text>
          <Dropdown
            style={[styles.dropdown, group ? styles.dropdownSelected : {}]}
            data={groupData}
@@ -94,12 +81,14 @@ export default function BetMaker() {
            placeholder="Select Group"
            value={group}
            onChange={(item) => setGroup(item.value)}
+           labelStyle={styles.dropdownText}          // Custom text style
+           selectedTextStyle={styles.dropdownText}  // Custom selected text style
+           placeholderStyle={styles.dropdownText}  // Custom placeholder style
          />
        </View>
 
-
        <View style={styles.dropdownWrapper}>
-         <Text>Person of Interest:</Text>
+         <Text style={styles.labelText}>Person of Interest:</Text>
          <Dropdown
            style={[
              styles.dropdown,
@@ -112,20 +101,22 @@ export default function BetMaker() {
            value={person}
            onChange={(item) => setPerson(item.value)}
            disabled={!group}
+           labelStyle={styles.dropdownText}          // Custom text style
+           selectedTextStyle={styles.dropdownText}  // Custom selected text style
+           placeholderStyle={styles.dropdownText}  // Custom placeholder style
          />
        </View>
      </View>
-
 
      {selectedIndex === 0 ? (
        <>
          <View style={styles.betLineContainer}>
            <View style={styles.betLineWrapper}>
-             <Text>Event Doesn't Happen:</Text>
+             <Text style={styles.labelText}>Event Doesn't Happen:</Text>
              <Text style={styles.betLineText}>{formatBetLine(-betLine)}</Text>
            </View>
            <View style={styles.betLineWrapper}>
-             <Text>Event Happens:</Text>
+             <Text style={styles.labelText}>Event Happens:</Text>
              <Text style={styles.betLineText}>{formatBetLine(betLine)}</Text>
            </View>
          </View>
@@ -142,12 +133,12 @@ export default function BetMaker() {
        <TextInput
          style={styles.textInput}
          placeholder="Enter Expected Number"
+         placeholderTextColor="rgba(255, 255, 255, 0.6)" // Placeholder text color
          keyboardType="numeric"
          value={expectedNumber}
          onChangeText={setExpectedNumber}
        />
      )}
-
 
      <Button
        title="Confirm"
@@ -166,9 +157,14 @@ const styles = StyleSheet.create({
    justifyContent: 'center',
    alignItems: 'center',
    padding: 20,
+   backgroundColor: '#A5C7D7', // Set background color here
  },
  buttonGroup: {
    marginVertical: 20,
+   marginHorizontal: 10,
+ },
+ selectedButton: {
+   backgroundColor: '#A5E490', // Set selected button color here
  },
  dropdownsContainer: {
    flexDirection: 'row',
@@ -184,28 +180,35 @@ const styles = StyleSheet.create({
  },
  dropdown: {
    height: 40,
-   borderColor: 'gray',
+   borderColor: 'white',
    borderWidth: 1,
-   borderRadius: 5,
+   borderRadius: 10, // Update border radius here
    width: '100%',
    paddingHorizontal: 10,
    marginVertical: 10,
  },
  dropdownSelected: {
-   borderColor: 'blue',
+   borderColor: 'dodgerdodgerblue',
  },
  dropdownDisabled: {
-   backgroundColor: '#d3d3d3', // Light gray background
-   borderColor: 'gray',
+   backgroundColor: '#d3d3d3', // Light #A5E490 background
+   borderColor: 'white',
+ },
+ dropdownText: {
+   color: 'white', // Set text color to white
  },
  textInput: {
    height: 40,
-   borderColor: 'gray',
+   borderColor: 'white',
    borderWidth: 1,
-   borderRadius: 5,
+   borderRadius: 10, // Update border radius here
    width: '100%',
    paddingHorizontal: 10,
    marginVertical: 10,
+   color: 'white', // Set text color to white
+ },
+ labelText: {
+   color: 'white', // Set label text color to white
  },
  betLineContainer: {
    width: '100%',
@@ -221,16 +224,16 @@ const styles = StyleSheet.create({
  betLineText: {
    fontSize: 18,
    fontWeight: 'bold',
+   color: 'white', // Set bet line text color to white
  },
  slider: {
    width: '100%',
    marginVertical: 20,
  },
  confirmButton: {
-   backgroundColor: 'blue',
+   backgroundColor: 'dodgerblue',
    marginTop: 20,
    width: '100%',
    padding: 15,
  },
 });
-

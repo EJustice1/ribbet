@@ -1,15 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FlatList, StyleSheet, SafeAreaView, Image, ScrollView, View, Text, TouchableOpacity, Modal, TextInput, Button, Alert } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons'; // Import Ionicons from react-native-vector-icons
-import ProfileCard from '../../components/ProfileCard'; // Adjust the import path as necessary
-
-const groupData = [
-  {
-    id: 1,
-    groupName: "Test Name",
-    size: 50
-  },
-];
+import Icon from 'react-native-vector-icons/Ionicons';
+import ProfileCard from '../../components/ProfileCard';
+import { useUserData } from '../../utils/UserDataContext';
 
 const availableIcons = [
   require("./assets/frog_default.png"),
@@ -21,15 +14,27 @@ const availableIcons = [
   require("./assets/frog_wizard.png"),
   require("./assets/frog_crown.png"),
   require("./assets/frog_clown.png"),
-  // Add more icons as needed
 ];
 
 export default function Profile() {
+  const { userData } = useUserData();
+  const [groupData, setGroupData] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [iconModalVisible, setIconModalVisible] = useState(false);
   const [groupName, setGroupName] = useState('');
   const [usernames, setUsernames] = useState(['']);
-  const [selectedIcon, setSelectedIcon] = useState(availableIcons[0]); // Default to the first icon
+  const [selectedIcon, setSelectedIcon] = useState(availableIcons[0]);
+
+  useEffect(() => {
+    if (userData && userData.profile && userData.profile.friendGroups) {
+      const transformedGroups = userData.profile.friendGroups.map(group => ({
+        id: group.id,
+        groupName: group.groupName,
+        size: group.friends ? group.friends.length : 0
+      }));
+      setGroupData(transformedGroups);
+    }
+  }, [userData]);
 
   const handleAddGroup = () => {
     Alert.alert('Group Created', `Group Name: ${groupName}\nUsernames: ${usernames.join(', ')}`);
@@ -55,14 +60,10 @@ export default function Profile() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Static Profile Section */} 
       <View style={styles.profileSection}>
-        {/* Background Rectangle */}
         <View style={styles.profileBackground} />
-      
-        {/* Static Profile Picture */}
         <TouchableOpacity style={styles.profileImageContainer} onPress={() => setIconModalVisible(true)}>
-            <Image source={selectedIcon} style={styles.image} resizeMode="center" />
+          <Image source={selectedIcon} style={styles.image} resizeMode="center" />
         </TouchableOpacity>
       </View>
 
@@ -71,20 +72,18 @@ export default function Profile() {
         contentContainerStyle={styles.scrollContainer}
       >
         <View style={styles.titleBar} />
-        {/* Scrollable Content */}
         <FlatList
           data={groupData}
           renderItem={({ item }) => <ProfileCard {...item} />}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.feedList}
+          ListEmptyComponent={<Text style={styles.emptyText}>No friend groups available</Text>}
         />
       </ScrollView>
 
-      {/* Floating circular button */}
       <TouchableOpacity style={styles.fab} onPress={() => setModalVisible(true)}>
         <Icon name="add" size={30} color="#fff" />
       </TouchableOpacity>
-
       {/* Modal for adding a group */}
       <Modal
         animationType="slide"
@@ -301,5 +300,11 @@ const styles = StyleSheet.create({
   addUsernameButtonText: {
     color: '#fff',
     fontSize: 16,
+  },
+  emptyText: {
+    color: '#fff',
+    fontSize: 18,
+    textAlign: 'center',
+    marginTop: 20,
   },
 });

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 
 const SignUp = ({ onSignUp, onSwitch }) => {
   const [name, setName] = useState('');
@@ -14,12 +14,19 @@ const SignUp = ({ onSignUp, onSwitch }) => {
 
   return (
     <View style={styles.container}>
+      {/* Static Welcome Image */}
+      <Image source={require("./assets/frog_default.png")} style={styles.welcomeImage} resizeMode="cover" />
+      
+      {/* Welcome Text */}
+      <Text style={styles.welcomeText}>Welcome to Ribbet</Text>
+
       <Text style={styles.title}>Sign Up</Text>
       <TextInput
         style={styles.input}
         placeholder="Name"
         value={name}
         onChangeText={setName}
+        placeholderTextColor="#fff" // Change placeholder text color
       />
       <TextInput
         style={styles.input}
@@ -28,6 +35,7 @@ const SignUp = ({ onSignUp, onSwitch }) => {
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
+        placeholderTextColor="#fff" // Change placeholder text color
       />
       <TextInput
         style={styles.input}
@@ -35,6 +43,7 @@ const SignUp = ({ onSignUp, onSwitch }) => {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        placeholderTextColor="#fff" // Change placeholder text color
       />
       <TouchableOpacity style={styles.button} onPress={handleSignUp}>
         <Text style={styles.buttonText}>Sign Up</Text>
@@ -52,23 +61,38 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    backgroundColor: '#A5C7D7',
+  },
+  welcomeImage: {
+    width: 100,
+    height: 100,
+    marginBottom: 20, // Increased spacing
+  },
+  welcomeText: {
+    fontSize: 24,
+    color: 'white',
+    marginBottom: 30, // Increased spacing
   },
   title: {
     fontSize: 24,
     marginBottom: 20,
+    color: 'white',
   },
   input: {
     width: '100%',
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 10,
+    marginBottom: 20, // Increased spacing
     paddingHorizontal: 10,
+    borderRadius: 10, // Rounded edges
+    color: '#fff', // Change input text color
   },
   button: {
-    backgroundColor: 'green',
+    backgroundColor: '#A5E490',
     padding: 10,
     borderRadius: 5,
+    marginBottom: 20, // Increased spacing
   },
   buttonText: {
     color: 'white',
@@ -78,7 +102,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   switchButtonText: {
-    color: 'green',
+    color: 'white',
     fontSize: 14,
   },
 });

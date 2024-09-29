@@ -5,15 +5,31 @@ import ProfileCard from '../../components/ProfileCard'; // Adjust the import pat
 
 const groupData = [
   {
+    id: 1,
     groupName: "Test Name",
     size: 50
   },
 ];
 
+const availableIcons = [
+  require("./assets/frog_default.png"),
+  require("./assets/frog.png"),
+  require("./assets/frog_suit.png"),
+  require("./assets/frog_fedora.png"),
+  require("./assets/frog_space.png"),
+  require("./assets/frog_gojo.png"),
+  require("./assets/frog_wizard.png"),
+  require("./assets/frog_crown.png"),
+  require("./assets/frog_clown.png"),
+  // Add more icons as needed
+];
+
 export default function Profile() {
   const [modalVisible, setModalVisible] = useState(false);
+  const [iconModalVisible, setIconModalVisible] = useState(false);
   const [groupName, setGroupName] = useState('');
   const [usernames, setUsernames] = useState(['']);
+  const [selectedIcon, setSelectedIcon] = useState(availableIcons[0]); // Default to the first icon
 
   const handleAddGroup = () => {
     Alert.alert('Group Created', `Group Name: ${groupName}\nUsernames: ${usernames.join(', ')}`);
@@ -32,6 +48,11 @@ export default function Profile() {
     setUsernames(updatedUsernames);
   };
 
+  const handleIconPress = (icon) => {
+    setSelectedIcon(icon);
+    setIconModalVisible(false);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Static Profile Section */} 
@@ -40,9 +61,9 @@ export default function Profile() {
         <View style={styles.profileBackground} />
       
         {/* Static Profile Picture */}
-        <View style={styles.profileImageContainer}>
-          <Image source={require("./assets/frog_wizard.png")} style={styles.image} resizeMode="center" />
-        </View>
+        <TouchableOpacity style={styles.profileImageContainer} onPress={() => setIconModalVisible(true)}>
+            <Image source={selectedIcon} style={styles.image} resizeMode="center" />
+        </TouchableOpacity>
       </View>
 
       <ScrollView
@@ -54,7 +75,7 @@ export default function Profile() {
         <FlatList
           data={groupData}
           renderItem={({ item }) => <ProfileCard {...item} />}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.feedList}
         />
       </ScrollView>
@@ -97,6 +118,30 @@ export default function Profile() {
             <View style={styles.modalButtons}>
               <Button title="Cancel" onPress={() => setModalVisible(false)} color="#fff" />
               <Button title="Add Group" onPress={handleAddGroup} color="#fff" />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal for changing profile icon */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={iconModalVisible}
+        onRequestClose={() => setIconModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.iconModalView}>
+            <Text style={styles.modalTitle}>Choose an Icon</Text>
+            <ScrollView contentContainerStyle={styles.iconContainer}>
+              {availableIcons.map((icon, index) => (
+                <TouchableOpacity key={index} onPress={() => handleIconPress(icon)} style={styles.iconWrapper}>
+                  <Image source={icon} style={styles.iconImage} resizeMode="center" />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <View style={styles.modalButtons}>
+              <Button title="Cancel" onPress={() => setIconModalVisible(false)} color="#fff" />
             </View>
           </View>
         </View>
@@ -199,11 +244,34 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
   },
+  iconModalView: {
+    width: 300,
+    height: 400, // Increased height to accommodate icons
+    backgroundColor: '#A5E490',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
   // Style for modal title
   modalTitle: {
     fontSize: 20,
     marginBottom: 15,
     color: '#fff', // Change modal title color
+  },
+  // Icon list container
+  iconContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+  },
+  // Icon wrapper style
+  iconWrapper: {
+    margin: 5,
+  },
+  // Individual icon image style
+  iconImage: {
+    width: 60,
+    height: 60,
   },
   // Style for text input fields
   input: {

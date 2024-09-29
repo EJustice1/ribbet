@@ -2,29 +2,36 @@ import React from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { OddsButton } from './Button';
 
-const ScrollCard = ({ league, status, time, title, team1, team2, score1, score2, odds1, odds2 }) => {
+// Helper function to format odds
+const formatOdds = (odds) => {
+  if (odds >= 0) {
+    return `+${odds}`;
+  } else {
+    return odds.toString();
+  }
+};
+
+const ScrollCard = ({ creator, subject, oddsPos, oddsNeg, description, endDate, group }) => {
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Text style={styles.league}>{league}</Text>
-        <View style={styles.statusContainer}>
-          <View style={styles.statusDot} />
-          <Text style={styles.status}>{status}</Text>
+        <View style={styles.personContainer}>
+          <Text style={styles.label}>Subject</Text>
+          <Text style={styles.personName}>{subject}</Text>
         </View>
-        <Text style={styles.time}>{time}</Text>
+        <View style={styles.personContainer}>
+          <Text style={styles.label}>Creator</Text>
+          <Text style={styles.personName}>{creator}</Text>
+        </View>
       </View>
-      <Text style={styles.title}>{title}</Text>
-      <View style={styles.teamsContainer}>
-        <View style={styles.teamColumn}>
-          <Text style={styles.teamName}>{team1}</Text>
-          <Text style={styles.score}>{score1}</Text>
-          <OddsButton odds={odds1} isPositive={odds1.startsWith('+')} />
-        </View>
-        <View style={styles.teamColumn}>
-          <Text style={styles.teamName}>{team2}</Text>
-          <Text style={styles.score}>{score2}</Text>
-          <OddsButton odds={odds2} isPositive={odds2.startsWith('+')} />
-        </View>
+      <Text style={styles.description}>{description}</Text>
+      <View style={styles.oddsContainer}>
+        <OddsButton odds={formatOdds(oddsPos)} isPositive={oddsPos >= 0} />
+        <OddsButton odds={formatOdds(oddsNeg)} isPositive={oddsNeg >= 0} />
+      </View>
+      <View style={styles.footer}>
+        <Text style={styles.endDate}>{new Date(endDate).toLocaleDateString()}</Text>
+        <Text style={styles.group}>{group}</Text>
       </View>
     </View>
   );
@@ -43,54 +50,44 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 10,
   },
-  league: {
-    color: '#ffffff',
-    fontSize: 14,
-  },
-  statusContainer: {
-    flexDirection: 'row',
+  personContainer: {
     alignItems: 'center',
   },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'red',
-    marginRight: 5,
+  label: {
+    color: '#8888aa',
+    fontSize: 10,
+    marginBottom: 2,
   },
-  status: {
+  personName: {
     color: '#ffffff',
     fontSize: 14,
+    fontWeight: 'bold',
   },
-  time: {
-    color: '#ffffff',
-    fontSize: 14,
-  },
-  title: {
+  description: {
     color: '#ffffff',
     fontSize: 16,
-    fontWeight: 'bold',
+    textAlign: 'center',
     marginBottom: 10,
   },
-  teamsContainer: {
+  oddsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 10,
+  },
+  footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  teamColumn: {
-    alignItems: 'center',
-  },
-  teamName: {
+  endDate: {
     color: '#ffffff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 5,
+    fontSize: 12,
   },
-  score: {
+  group: {
     color: '#ffffff',
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 12,
   },
 });
 
 export default ScrollCard;
+
+

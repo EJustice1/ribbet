@@ -1,30 +1,17 @@
-import React from 'react';
-
-const mockUsers = [
-  { email: 'user1@example.com', password: 'password1', name: 'User One' },
-  { email: 'user2@example.com', password: 'password2', name: 'User Two' },
-];
+import { mockUsers } from './mockData';
 
 export const signIn = (email, password) => {
-  const user = mockUsers.find(u => u.email === email && u.password === password);
+  console.log('MockAuth: Attempting sign in with:', email);
+  
+  // In a real app, you'd hash the password before comparing
+  const user = mockUsers.find(u => u.email === email);
+  
   if (user) {
-    return { success: true, user: { email: user.email, name: user.name } };
+    console.log('MockAuth: User found:', user);
+    // For mock purposes, we're not checking the password
+    return { success: true, user: { id: user.id, email: user.email } };
+  } else {
+    console.log('MockAuth: User not found');
+    return { success: false, message: 'Invalid email or password' };
   }
-  return { success: false, message: 'Invalid email or password' };
 };
-
-export const signUp = (name, email, password) => {
-  if (mockUsers.some(u => u.email === email)) {
-    return { success: false, message: 'Email already in use' };
-  }
-  const newUser = { name, email, password };
-  mockUsers.push(newUser);
-  return { success: true, user: { email: newUser.email, name: newUser.name } };
-};
-
-const MockAuth = () => {
-  // This component doesn't render anything, it's just a container for the mock auth functions
-  return null;
-};
-
-export default MockAuth;

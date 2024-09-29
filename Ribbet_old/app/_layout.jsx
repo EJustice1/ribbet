@@ -5,9 +5,11 @@ import { View } from 'react-native';
 import SignIn from './auth/SignIn';
 import SignUp from './auth/SignUp';
 import { signIn, signUp } from './auth/MockAuth';
+import { UserDataProvider, useUserData } from '../utils/UserDataContext';
+import { populateUserData } from '../utils/dataManager';
 //import Tabs from './tabs/Tabs';
 
-import { Profile, Bet, FriendGroup, populateProfile, populateBet, populateFriendGroup } from '../components/Classes.js';
+//import { Profile, Bet, FriendGroup, populateProfile, populateBet, populateFriendGroup } from '../components/Classes.js';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -16,26 +18,10 @@ const RootLayout = ({ loggedInUsername }) => {
     // Add your custom fonts here if needed
   });
 
-  // const [profile, setProfile] = useState(null);
-  // const [friendGroups, setFriendGroups] = useState([]);
-  // const [bets, setBets] = useState([]);
 
-  // useEffect(() => {
-  //   // Example of fetching data when the user logs in
-  //   const fetchUserData = async () => {
-  //     const response = await fetch(`https://your-backend.com/api/user/${loggedInUsername}`);
-  //     const data = await response.json();
-
-  //     // Populate the classes using data
-  //     setProfile(populateProfile(data));
-  //     setFriendGroups(data.friendGroups.map(group => populateFriendGroup(group)));
-  //     setBets(data.createdBets.map(bet => populateBet(bet)));
-  //   };
-
-  //   fetchUserData();
-  // }, [loggedInUsername]);
   const [user, setUser] = useState(null);
   const [isSignUp, setIsSignUp] = useState(false);
+  const { loadUserData } = useUserData();
 
   useEffect(() => {
     if (fontsLoaded) {
@@ -43,10 +29,22 @@ const RootLayout = ({ loggedInUsername }) => {
     }
   }, [fontsLoaded]);
 
+  useEffect(() => {
+    if (user) {
+      loadUserData(user.id);
+    }
+  }, [user]);
+
   const handleSignIn = ({ email, password }) => {
     const result = signIn(email, password);
     if (result.success) {
       setUser(result.user);
+
+      // Populate user data
+      const userData = populateUserData(result.user.id);
+      
+      // Store the populated data in the context
+      loadUserData(userData);
     } else {
       // Handle error (e.g., show an alert)
       console.error(result.message);
@@ -90,4 +88,10 @@ const RootLayout = ({ loggedInUsername }) => {
   );
 };
 
-export default RootLayout;
+const WrappedRootLayout = () => (
+  <UserDataProvider>
+    <RootLayout />
+  </UserDataProvider>
+);
+
+export default WrappedRootLayout;

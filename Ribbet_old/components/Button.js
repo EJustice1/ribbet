@@ -1,11 +1,13 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-export const OddsButton = ({ odds, isPositive }) => (
-  <TouchableOpacity style={[styles.oddsButton, isPositive ? styles.positiveOdds : styles.negativeOdds]}>
-    <Text style={styles.oddsText}>{isPositive ? '+' : ''}{odds}</Text>
-  </TouchableOpacity>
-);
+export const OddsButton = ({ odds, isPositive }) => {
+  return (
+    <TouchableOpacity style={[styles.oddsButton, isPositive ? styles.positiveOdds : styles.negativeOdds]}>
+      <Text style={styles.oddsText}>{odds}</Text>
+    </TouchableOpacity>
+  );
+}
 
 export const PrimaryButton = ({ title, onPress }) => (
   <TouchableOpacity style={styles.primaryButton} onPress={onPress}>
@@ -67,3 +69,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+export default { OddsButton, PrimaryButton, SecondaryButton };
+
